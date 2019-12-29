@@ -1,12 +1,24 @@
 import socket
 import pandas as pd
-servSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-servSocket.bind(('localhost', 8000))
+from _thread import *
+import selectors
+from threaded import *
 
-servSocket.listen(10)
 
-print(pd.read_csv("./Accounts.csv"))
 
-df = pd.read_csv("./Accounts.csv")
-df_ = pd.DataFrame(["lewie","6448469829751745978","140.112.107.210","1"], df.va)
-pd.concat([df, ], axis= 1)
+if __name__ == "__main__":
+
+    # On starting, it should go through the harddisk storage.
+
+
+    
+    servSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    servSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    servSocket.bind(('localhost', 8000))
+
+    s = servSocket.listen(10)
+    while 1:
+        conn, addr = servSocket.accept()
+        print ("New connection from IP: {}, Port: {}".format(addr[0], addr[1]))
+        start_new_thread(threaded, (conn, ) )
+        
