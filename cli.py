@@ -8,7 +8,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     while True:
         cmd = input("msg: > ")
         s.sendall(cmd.encode('ascii'))
+        rep = s.recv(1000).decode('ascii')
+        print(rep)
         if cmd == "end":
             break
-
-print('Received', repr(data))
