@@ -124,9 +124,13 @@ def SendMessage(username, message, sock):
 	lock.release()
 	#reply = sock.recv()
 def ChatNewMessage(root):
-	try:
+    	try:
 		userinput = root.queue.get(0)
 		root.clear_chat_text()
+		#chardata = ''
+		#charjson = json.loads(userinput)
+		#for sentence in charjson:
+			#chardata += sentence['Sender']
 		root.newmessage(userinput + '\n')
 		#global lock
 		#msg = 'ask new message'
