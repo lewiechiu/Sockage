@@ -7,12 +7,10 @@ import threading
 import functools
 import queue as Queue
 
-gcnt = 0
-print(gcnt)
 lock = threading.Lock()
 '''
 HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 8000        # The port used by the server
+PORT = 65432        # The port used by the server
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 	s.connect((HOST, PORT))
@@ -24,7 +22,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
 def SocketSetup():
 	HOST = '127.0.0.1'  # The server's hostname or IP address
-	PORT = 8000         # The port used by the server
+	PORT = 65432        # The port used by the server
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.connect((HOST, PORT))
 	return s
@@ -70,6 +68,9 @@ def logout():
 	return 1
 
 def login_username(username, sock):
+	if ' ' in username:
+		print('should not have space!')
+		return 0
 	msg = 'LOGIN ' + username
 	sock.sendall(msg.encode())
 	reply = sock.recv(1024)
@@ -92,6 +93,9 @@ def login_password(password, sock):
 		return 0
 
 def register_username(username, sock):
+	if ' ' in username:
+		print('should not have space!')
+		return 0
 	msg = 'REGISTER ' + username
 	sock.sendall(msg.encode())
 	reply = sock.recv(1024)
@@ -122,6 +126,7 @@ def SendMessage(username, message, sock):
 def ChatNewMessage(root):
 	try:
 		userinput = root.queue.get(0)
+		root.clear_chat_text()
 		root.newmessage(userinput + '\n')
 		#global lock
 		#msg = 'ask new message'
@@ -148,14 +153,23 @@ class RecvThread(threading.Thread):
 		while True:
 			if self.root.running != 1:
 				break
-			time.sleep(3)  # Simulate long running process
+			time.sleep(1)  # Simulate long running process
 			#TODO
 			#recv from scoket
 			global lock
 			lock.acquire()
-			self.queue.put(str(self.cnt))
-			print('a')
-			self.cnt += 1
+			msg = 'GETMSG ' + self.username 
+			sock.sendall(msg.encode())
+			reply = sock.recv(1024)
+			if reply == b'NOTEXIST':
+				print('get error when routine check')
+			else:
+				self.queue.put(reply.encode())
+				#print('chatwith:', reply)
+
+			#self.queue.put(str(self.cnt))
+			print('thread!')
+			#self.cnt += 1
 			lock.release()
 
 class ChatRoom(tk.Tk):
@@ -251,8 +265,6 @@ class ChatRoom(tk.Tk):
 			messagebox.showinfo(title='start chat', message='let\'s chat!')
 		else:
 			messagebox.showinfo(title='cannot chat!', message='no this user or not online')
-		global gcnt
-		gcnt = 0
 	def go_mainpage(self):
 		logout()
 		self.destroy()
