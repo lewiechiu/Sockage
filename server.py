@@ -4,6 +4,7 @@ import pandas as pd
 from _thread import *
 import selectors
 from threaded import *
+import json
 
 
 class server:
@@ -53,3 +54,21 @@ class server:
         print("User: {} Loggen in!".format(name))
         # Check if the pwd matches the pwd of registered name.
         return True
+    def GetChat(self, name, recv, whoami):
+        print("getting chat {} {}".format(name, recv))
+        chat = []
+        df = pd.read_csv("./storing/chatroom/{}_{}.csv".format(name, recv))
+        print(df)
+        for i in df.values:
+            chat.append({
+                "msg": i[2],
+                "sender": i[1],
+                name : i[3],
+                recv : i[4]})
+        chat = json.dumps(chat)
+        pos = 3
+        if whoami == recv:
+            pos = 4
+        for i in range(len(df.values)):
+            df.iloc[i, pos] = 1
+        return chat

@@ -46,6 +46,19 @@ For server side, registered client file will have a file call
 
 ### storing
 
-* Accounts.csv: Records the User's *Name*, *password*, *IP*, *active state*.
-* Chatroom.csv: Stores who (*name*) is in which chatroom(*RoomID*).
-* ./chatroom/: Within this directory, file names are the ID that can be found in *Chatroom.csv*.
+#### Accounts.csv
+
+* Records the User's *Name*, *password*, *IP*, *active state*.
+
+#### Chatroom.csv
+
+* Stores who (*name*) is in which chatroom(*RoomID*).
+
+#### ./chatroom/
+
+* Within this directory, file names are the ID that can be found in 
+*Chatroom.csv*.
+
+#### Historical.csv
+
+![alt](./mermaid-diagram-20200101125715.svg)
