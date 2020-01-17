@@ -45,5 +45,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
     ##### GETFILE
     s.sendall("GETFILE".encode('ascii'))
-
+    resp = s.recv(1000).decode()
+    for i in 
+    while fi:
+        # Make a loading bar here.
+        f.write(fi)
+        fi = c.recv(1000  )
+        print(fi)
+        if b'END' in fi:
+            break
+    f.close()
     s.close()

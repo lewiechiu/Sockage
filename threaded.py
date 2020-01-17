@@ -22,11 +22,11 @@ def threaded(c, SERVER):
             name = data.replace("REGISTER ", "")
             name = name.replace('\n', "")
             if SERVER.GetClient(name):
-                c.send("No".encode('ascii'))
+                c.send("NO".encode('ascii'))
                 print("user Exists")
                 continue
             else:
-                c.send("Yes".encode('ascii'))
+                c.send("YES".encode('ascii'))
             pwd = c.recv(MSG_SIZE).decode('ascii')
             pwd = pwd.replace('\n', "")
             if SERVER.Register(name, pwd):
@@ -49,14 +49,14 @@ def threaded(c, SERVER):
             c.send("HI".encode('ascii'))
             pwd = c.recv(MSG_SIZE).decode('ascii')
             if SERVER.Login(name, pwd):
-                c.send("Welcome!... Unread msgs:{}".format(3).encode("ascii"))
+                c.send("WELCOME".encode("ascii"))
                 Name = name
             else:
                 c.send("GO AWAY".encode("ascii"))
         elif "GETMSG" in data and Name != None:
             data = data.replace("GETMSG ", "")
             if not SERVER.GetClient(data):
-                c.send("User : {} NOTEXIST".format(data).encode('ascii'))
+                c.send("NOTEXIST".encode('ascii'))
                 return
             if data > Name:
                 chat = SERVER.GetChat(Name, data, Name)
@@ -71,9 +71,6 @@ def threaded(c, SERVER):
             data = data.replace(receiver, "")
             data = data.replace(" ", "", 1)
             print(data)
-            if not SERVER.GetClient(receiver):
-                c.send("User: {} NOTEXIST".format(receiver).encode('ascii'))
-                return
             if receiver > Name:
                 SERVER.UpdateChat(Name, receiver, Name, data)
             else:
@@ -84,7 +81,7 @@ def threaded(c, SERVER):
             data = data.replace('\n','')
             print(data)
             if not SERVER.isLoggedIn(data):
-                c.send("OFFLINE {}".format(data).encode('ascii'))
+                c.send("OFFLINE".format(data).encode('ascii'))
                 return 
             
             c.send("OK".encode('ascii'))
@@ -105,7 +102,17 @@ def threaded(c, SERVER):
             print("Finish receiving")
             c.send("DONE".encode('ascii'))
         elif "GETFILE" in data and Name != None:
-            data = data.replace("GETFILE ", "")
             can_send = SERVER.Receivable(Name)
+            c.send("{}".format(len(can_send)))
             if len(can_send) == 0:
-                c.send("")
+                c.send("NOFILES".encode('ascii'))
+                return
+            
+            for i in can_send:
+                c.send("SENDING {}".format(i))
+                f = open("{}".format(i), "rb")
+                l = f.read(1000)
+                while l:
+                    c.sendall(l)
+                    l = c.read(1000)
+                c.sendall(b'END')
