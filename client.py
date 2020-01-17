@@ -6,7 +6,6 @@ import time
 import threading
 import functools
 import queue as Queue
-import json
 
 lock = threading.Lock()
 username_lock = threading.Lock()
@@ -29,6 +28,10 @@ def SocketSetup():
 	s.connect((HOST, PORT))
 	return s
 
+def ask_recv_file(sock):
+    	#TODO 
+	return 1
+#def check_new_message(sock):
 
 def chatwith(username,root):
 	#try:
@@ -59,27 +62,6 @@ def chatwith(username,root):
 	else:
 		return 0
 	'''
-
-def sendfile(filename, username, root):
-	global lock
-	lock.acquire()
-	msg = 'SENDFILE ' + username
-	root.sock.sendall(msg.encode())
-	reply = root.sock.recv(1024)
-	if reply == b'OK':
-		try:
-			root.sock.sendall(filename.encode())
-			root.sock.recv(1000)
-			print("file name: {}".format(filename))
-			f = open("{}".format( filename), "rb")
-
-			root.sock.sendall(f.read())
-			root.sock.sendall(b'END')
-		except:
-			pass
-	else:
-		print('sendfile:', reply)
-	lock.release()
 
 def logout():
 	#TODO send by tcp socket
@@ -141,23 +123,11 @@ def SendMessage(username, message, sock):
 	reply = sock.recv(1024)
 	lock.release()
 	#reply = sock.recv()
-def parseChatJson(input):
-	chardata = ''
-		charjson = json.loads(input)
-		readed = 1
-		for sentence in charjson:
-			chardata += sentence['Sender'] + ': '
-			chardata += sentence['msg'] + '\n'
-			if readed == 1 && sentence[root.myusername] == 0:
-				readed = 0
-				chardata += '     =========unread=========\n'
-	return chardata
 def ChatNewMessage(root):
 	try:
 		userinput = root.queue.get(0)
 		root.clear_chat_text()
-		chardata = parseChatJson(userinput)
-		root.newmessage(chardata)
+		root.newmessage(userinput + '\n')
 		#global lock
 		#msg = 'ask new message'
 		#lock.acquire()
@@ -200,30 +170,13 @@ class RecvThread(threading.Thread):
 				else:
 					self.queue.put(reply.decode())
 				#print('chatwith:', reply)
-			msg = 'GETFILE'
-			lock.acquire()
-			self.sock.sendall(msg.encode())
-			reply = self.sock.recv(1024)
-			if reply == b'NOFILES':
-				pass
-			else:
-				numoffile = int(reply.decode())
-				for i in range(numoffile):
-					reply = self.sock.recv(8).decode()
-					reply = reply.replace('SENDING ','')
-					reply = self.sock.recv(8).decode()
-					reply = self.sock.recv(1000)
-					while reply:
-
-
 			#self.queue.put(str(self.cnt))
 			print('thread!')
 			#self.cnt += 1
 class ChatRoom(tk.Tk):
 	def __init__(self, username, sock):
 		super().__init__()
-		self.myusername = username
-		self.username = ''
+		self.username = username
 		self.sock = sock
 		self.queue = Queue.Queue()
 		self.chatting = 0
@@ -261,6 +214,7 @@ class ChatRoom(tk.Tk):
 		self.msg.pack(fill="none", expand=True, side=tk.LEFT)
 		self.send = tk.Button(self.messageframe, text='send', command=self.sendmessage)
 		self.send.pack(side=tk.LEFT)
+
 		self.file_username_label = tk.Label(self, text='file receiver', 
 								background='black', 
 								fg='white', 
@@ -275,7 +229,7 @@ class ChatRoom(tk.Tk):
 		self.filename_label.pack()
 		self.filename_entry = tk.Entry(self)
 		self.filename_entry.pack()
-		self.sendfile = tk.Button(self, text='sendfile', command=self.send_file)
+		self.sendfile = tk.Button(self, text='sendfile')
 		self.sendfile.pack()
 
 		self.backtomain = tk.Button(self, text='logout', command=self.go_mainpage)
@@ -321,7 +275,7 @@ class ChatRoom(tk.Tk):
 		self.destroy()
 		mainpage(self.sock)
 	def send_file(self):
-		sendfile(self.filename_entry.get(), self.file_username_entry.get(), self)
+		print('send file')
 	def clear_chat_text(self):
 		self.chat.config(state="normal")
 		self.chat.delete('1.0', 'end')
@@ -452,9 +406,8 @@ class LoginPage(tk.Tk):
 				messagebox.showinfo(title='password', message='password GG!')
 			else:
 				messagebox.showinfo(title='login', message='success')
-				myusername = self.username_entry.get()
 				self.destroy()
-				mainapplication(self.sock, myusername)
+				mainapplication(self.sock)
 
 		#messagebox.showinfo(title='send_request', message='succeed')
 	def go_mainpage(self):
@@ -513,9 +466,10 @@ def login(sock):
 	loginpage = LoginPage(sock)
 	loginpage.mainloop()
 
-def mainapplication(sock, username):
+def mainapplication(sock):
 	#mainapplicationpage = MainApplication(sock)
 	#mainapplicationpage.mainloop()
+	username = 'OuO'
 	chatr = ChatRoom(username, sock)
 	chatr.after(1000, ChatNewMessage, chatr)
 	chatr.mainloop()
