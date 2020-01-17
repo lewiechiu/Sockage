@@ -12,43 +12,43 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.sendall("999".encode('ascii'))
     
 
-    s.sendall("GETMSG abc".encode('ascii'))
-    rep = s.recv(10000).decode('ascii')
-    time.sleep(0.5)
-    while True:
-        s.sendall("GETMSG gg".encode('ascii'))
-        # rep = s.recv(10000).decode('ascii')
-        time.sleep(0.5)
-        # s.sendall(cmd.encode('ascii'))
-        # rep = s.recv(10000).decode('ascii')
-        s.sendall("""SEND Lewie I'd like to, "here" you go. """.encode('ascii'))
-        time.sleep(0.5)
-        rep = s.recv(10000).decode('ascii')
-        input()
-        print(rep)
-        # if cmd == "end":
-        #     break
+    # s.sendall("GETMSG abc".encode('ascii'))
+    # rep = s.recv(10000).decode('ascii')
+    # time.sleep(0.5)
+    # while True:
+    #     s.sendall("GETMSG gg".encode('ascii'))
+    #     # rep = s.recv(10000).decode('ascii')
+    #     time.sleep(0.5)
+    #     # s.sendall(cmd.encode('ascii'))
+    #     # rep = s.recv(10000).decode('ascii')
+    #     s.sendall("""SEND Lewie I'd like to, "here" you go. """.encode('ascii'))
+    #     time.sleep(0.5)
+    #     rep = s.recv(10000).decode('ascii')
+    #     input()
+    #     print(rep)
+    #     # if cmd == "end":
+    #     #     break
 
-    ##### Test sending files.
-    # rep = s.recv(10000).decode('ascii')
-    # print(rep)
-    # s.sendall("SENDFILE ZZZ\n".encode('ascii'))
-    # time.sleep(0.5)
-    # rep = s.recv(10000).decode('ascii')
-    # print(rep)
-    # time.sleep(0.5)
-    # s.sendall("{}".format(filename).encode('ascii'))
-    # f = open("{}".format(filename), "rb")
-    # l = f.read(1000)
-    # while l:
-    #     s.sendall(l)
-    #     l = f.read(1000)
-    # s.sendall(b'END')
-    # time.sleep(1)
-    # print("done sending")
-    # rep = s.recv(10000).decode('ascii')
-    # print(rep)
-    ##### Close
+    #### Test sending files.
+    rep = s.recv(10000).decode('ascii')
+    print(rep)
+    s.sendall("SENDFILE ZZZ\n".encode('ascii'))
+    time.sleep(0.5)
+    rep = s.recv(10000).decode('ascii')
+    print(rep)
+    time.sleep(0.5)
+    s.sendall("{}".format(filename).encode('ascii'))
+    f = open("{}".format(filename), "rb")
+    l = f.read(1000)
+    while l:
+        s.sendall(l)
+        l = f.read(1000)
+    s.sendall(b'END')
+    time.sleep(1)
+    print("done sending")
+    rep = s.recv(10000).decode('ascii')
+    print(rep)
+    #### Close
 
     ##### GETFILE
     s.sendall("GETFILE".encode('ascii'))
