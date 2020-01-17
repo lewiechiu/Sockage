@@ -87,11 +87,11 @@ def threaded(c, SERVER):
             print(data)
             if not SERVER.isLoggedIn(data):
                 c.send("OFFLINE".format(data).encode('ascii'))
-                
-                
+            else:
                 c.send("OK".encode('ascii'))
                 # Receives the filename and filesize
                 filename = receive(c)
+                c.send("OK".encode('ascii'))
                 # Start to receive the file.
                 print("file name: {}".format(filename))
                 f = open("{}_{}".format(data, filename), "wb")
@@ -106,18 +106,24 @@ def threaded(c, SERVER):
                 f.close()
                 print("Finish receiving")
                 c.send("DONE".encode('ascii'))
+                
+                
+            
         elif "GETFILE" in data and Name != None:
             can_send = SERVER.Receivable(Name)
-            c.send("{}".format(len(can_send)))
             if len(can_send) == 0:
                 c.send("NOFILES".encode('ascii'))
-                return
-            
-            for i in can_send:
-                c.send("SENDING {}".format(i))
-                f = open("{}".format(i), "rb")
-                l = f.read(1000)
-                while l:
-                    c.sendall(l)
-                    l = c.read(1000)
-                c.sendall(b'END')
+            else:
+                c.send("{}".format(len(can_send)))
+                
+                
+                for i in can_send:
+                    c.send("SENDING {}".format(i))
+                    f = open("{}".format(i), "rb")
+                    l = f.read(1000)
+                    while l:
+                        c.sendall(l)
+                        l = f.read(1000)
+                    c.sendall(b'END')
+        elif "LOGOUT" in data and Name != None:
+            SERVER.GoOffline(Name)

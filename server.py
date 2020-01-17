@@ -61,7 +61,7 @@ class server:
         if can_login == False:
             return can_login
         df.to_csv("./storing/Accounts.csv", index=False)
-        print("User: {} Loggen in!".format(name))
+        print("User: {} Logged in!".format(name))
         self.OnlineUsers.add(name)
         # Check if the pwd matches the pwd of registered name.
         return True
@@ -69,9 +69,10 @@ class server:
         print("getting chat {} {}".format(name, recv))
         chat = []
         print(os.listdir('./storing/chatroom/'))
-        if "{}_{}".format(name, recv) not in os.listdir('./storing/chatroom/'):
+        if "{}_{}.csv".format(name, recv) not in os.listdir('./storing/chatroom/'):
             df = pd.DataFrame(columns= ["No","Sender","msg","A_read","B_read"])
             df.to_csv("./storing/chatroom/{}_{}.csv".format(name, recv), index=False)
+            return json.dumps([])
         df = pd.read_csv("./storing/chatroom/{}_{}.csv".format(name, recv))
         print(df)
         for i in df.values:
@@ -90,6 +91,7 @@ class server:
         return chat
     def UpdateChat(self, name, recv, whoami, message):
         df = pd.read_csv("./storing/chatroom/{}_{}.csv".format(name, recv))
+        print("Message: {}".format(message))
         col = df.columns
         if len(df.values) > 0:
             last_NO = int(df.values[-1][0]) + 1
@@ -102,6 +104,8 @@ class server:
         df_t = pd.DataFrame(insert_data, columns=col)
         df = df.append(df_t, ignore_index=True)
         df.to_csv("./storing/chatroom/{}_{}.csv".format(name, recv), index=False, quoting=csv.QUOTE_NONNUMERIC)
+        print(df.values)
+
         return 
     def Storefile(self):
         pass
@@ -112,3 +116,14 @@ class server:
             if name in i:
                 matching_files.append(i)
         return matching_files
+    def GoOffline(self, name):
+        df = pd.read_csv("./storing/Accounts.csv")
+        for i in range(len(df.active)):
+            if df.Username[i] == name and df.active[i] == 1:
+                df.active[i] = 0
+                break
+        df.to_csv("./storing/Accounts.csv", index=False)
+        print("User: {} Logged Out!".format(name))
+        self.OnlineUsers.remove(name)
+        # Check if the pwd matches the pwd of registered name.
+        return True

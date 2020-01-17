@@ -28,10 +28,6 @@ def SocketSetup():
 	s.connect((HOST, PORT))
 	return s
 
-def ask_recv_file(sock):
-	#TODO 
-	return 1
-#def check_new_message(sock):
 
 def chatwith(username,root):
 	#try:
@@ -62,6 +58,27 @@ def chatwith(username,root):
 	else:
 		return 0
 	'''
+
+def sendfile(filename, username, root):
+	global lock
+	lock.acquire()
+	msg = 'SENDFILE ' + username
+	root.sock.sendall(msg.encode())
+	reply = root.sock.recv(1024)
+	if reply == b'OK':
+		try:
+			root.sock.sendall(filename.encode())
+			root.sock.recv(1000)
+			print("file name: {}".format(filename))
+			f = open("{}".format( filename), "rb")
+
+			root.sock.sendall(f.read())
+			root.sock.sendall(b'END')
+		except:
+			pass
+	else:
+		print('sendfile:', reply)
+	lock.release()
 
 def logout():
 	#TODO send by tcp socket
@@ -229,7 +246,7 @@ class ChatRoom(tk.Tk):
 		self.filename_label.pack()
 		self.filename_entry = tk.Entry(self)
 		self.filename_entry.pack()
-		self.sendfile = tk.Button(self, text='sendfile')
+		self.sendfile = tk.Button(self, text='sendfile', command=self.send_file)
 		self.sendfile.pack()
 
 		self.backtomain = tk.Button(self, text='logout', command=self.go_mainpage)
@@ -275,7 +292,7 @@ class ChatRoom(tk.Tk):
 		self.destroy()
 		mainpage(self.sock)
 	def send_file(self):
-		print('send file')
+		sendfile(self.filename_entry.get(), self.file_username_entry.get(), self)
 	def clear_chat_text(self):
 		self.chat.config(state="normal")
 		self.chat.delete('1.0', 'end')
