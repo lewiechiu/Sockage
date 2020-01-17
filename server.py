@@ -5,7 +5,8 @@ from _thread import *
 import selectors
 from threaded import *
 import json
-
+import csv
+from multiprocessing import Lock()
 
 class server:
     def __init__(self, path_user):
@@ -71,4 +72,17 @@ class server:
             pos = 4
         for i in range(len(df.values)):
             df.iloc[i, pos] = 1
+        df.to_csv("./storing/chatroom/{}_{}.csv".format(name, recv), index=False, quoting=csv.QUOTE_NONNUMERIC)
         return chat
+    def UpdateChat(self, name, recv, whoami, message):
+        df = pd.read_csv("./storing/chatroom/{}_{}.csv".format(name, recv))
+        col = df.columns
+        last_NO = int(df.values[-1][0]) + 1
+        if whoami == name:
+            insert_data = [[last_NO, whoami, message, 1, 0]]
+        else:
+            insert_data = [[last_NO, whoami, message, 0, 1]]
+        df_t = pd.DataFrame(insert_data, columns=col)
+        df = df.append(df_t, ignore_index=True)
+        df.to_csv("./storing/chatroom/{}_{}.csv".format(name, recv), index=False, quoting=csv.QUOTE_NONNUMERIC)
+        return 

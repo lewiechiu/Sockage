@@ -67,9 +67,16 @@ def threaded(c, SERVER):
                 
             pass
         elif "SEND" in data and Name != None:
-            data = data.replace("DATA ", "")
+            data = data.replace("SEND ", "")
             receiver = data.split(' ')[0]
+            data = data.replace(receiver, "")
+            data = data.replace(" ", "", 1)
+            print(data)
             if not SERVER.GetClient(receiver):
                 c.send("User: {} NOTEXIST".format(receiver).encode('ascii'))
                 return
-            
+            if receiver > Name:
+                SERVER.UpdateChat(Name, receiver, Name, data)
+            else:
+                SERVER.UpdateChat(receiver, Name, Name, data)
+            c.send("DONE".encode('ascii'))
