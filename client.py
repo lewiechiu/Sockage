@@ -62,6 +62,26 @@ def chatwith(username,root):
 	else:
 		return 0
 	'''
+def sendfile(filename, username, root):
+    	global lock
+	lock.acquire()
+	msg = 'SENDFILE ' + username
+	root.sock.sendall(msg.encode())
+	reply = root.sock.recv(1024)
+	if reply == b'OK':
+		try:
+			root.sock.sendall(filename.encode())
+			root.sock.recv(1000)
+			print("file name: {}".format(filename))
+			f = open("{}".format( filename), "rb")
+
+			root.sock.sendall(f.read())
+			root.sock.sendall(b'END')
+		except:
+			pass
+	else:
+		print('sendfile:', reply)
+	lock.release()
 
 def logout():
 	#TODO send by tcp socket
