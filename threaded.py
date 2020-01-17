@@ -91,6 +91,7 @@ def threaded(c, SERVER):
                 c.send("OK".encode('ascii'))
                 # Receives the filename and filesize
                 filename = receive(c)
+                c.send("OK".encode('ascii'))
                 # Start to receive the file.
                 print("file name: {}".format(filename))
                 f = open("{}_{}".format(data, filename), "wb")
@@ -124,5 +125,5 @@ def threaded(c, SERVER):
                         c.sendall(l)
                         l = f.read(1000)
                     c.sendall(b'END')
-        elif "LOGOUT" in data:
-            SERVER.
+        elif "LOGOUT" in data and Name != None:
+            SERVER.GoOffline(Name)
