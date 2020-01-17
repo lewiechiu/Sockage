@@ -7,7 +7,7 @@ from threaded import *
 import json
 import csv
 import os
-
+import hashlib
 class server:
     def __init__(self, path_user):
         Users = set()
@@ -27,7 +27,10 @@ class server:
             # print(name, pwd)
             df = pd.read_csv("./storing/Accounts.csv")
             col = df.columns
-            df_t = pd.DataFrame([[name, hash(pwd), "140.112.106.88", 0]], columns=col)
+            md5 = hashlib.md5()
+            md5.update(pwd.encode())
+            hashpwd = md5.hexdigest()
+            df_t = pd.DataFrame([[name, hashpwd, "140.112.106.88", 0]], columns=col)
             df = df.append(df_t, ignore_index=True)
             df.to_csv("./storing/Accounts.csv", index=False)
             print("Currently Registered Clients")
@@ -52,9 +55,12 @@ class server:
         print(name, pwd)
         df = pd.read_csv("./storing/Accounts.csv")
         can_login = False
+        md5 = hashlib.md5()
+        md5.update(pwd.encode())
+        hashpwd = md5.hexdigest()
         for i in range(len(df.active)):
             if df.Username[i] == name and df.active[i] == 0:
-                if df.hashed_pwd[i] == hash(pwd):
+                if df.hashed_pwd[i] == hashpwd:
                     df.active[i] = 1
                     can_login = True
                     break

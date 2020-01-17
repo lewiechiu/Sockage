@@ -6,6 +6,7 @@ import time
 import threading
 import functools
 import queue as Queue
+import json
 
 lock = threading.Lock()
 username_lock = threading.Lock()
@@ -146,12 +147,19 @@ def SendMessage(username, message, sock):
 def ChatNewMessage(root):
 	try:
 		userinput = root.queue.get(0)
+		u_i = json.loads(userinput)
+		user_text = ""
+		for u in u_i:
+			user_text += u['sender']
+			user_text += ':> '
+			user_text += u['msg']
+			user_text += '\n'
 		root.clear_chat_text()
 		#chardata = ''
 		#charjson = json.loads(userinput)
 		#for sentence in charjson:
 			#chardata += sentence['Sender']
-		root.newmessage(userinput + '\n')
+		root.newmessage(user_text + '\n')
 		#global lock
 		#msg = 'ask new message'
 		#lock.acquire()
@@ -197,11 +205,13 @@ class RecvThread(threading.Thread):
 			msg = 'GETFILE'
 			lock.acquire()
 			self.sock.sendall(msg.encode())
-			reply = self.sock.recv(1024)
-			if reply == b'NOFILES':
+			reply = self.sock.recv(1024).decode()
+			print('get file recv:', reply)
+			if 'NOFILES' in reply:
 				pass
 			else:
-				reply = reply.decode()
+				print('wait file')
+				# reply = reply.decode()
 				numoffile = int(reply)
 				print("num: {}".format(numoffile))
 				self.sock.send(b'ACK')
@@ -221,6 +231,7 @@ class RecvThread(threading.Thread):
 					self.sock.send(b'ACK')
 					print(f'Success receive {filename}')
 					f.close()
+				print('file finish')
 						
 			lock.release()
 			#self.queue.put(str(self.cnt))
