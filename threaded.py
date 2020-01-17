@@ -9,8 +9,7 @@ def threaded(c, SERVER):
     # This "Name" variable will be None before Logged In.
     Name = None
     while True:
-        data = c.recv(MSG_SIZE)
-        data = data.decode('ascii')
+        data = c.recv(MSG_SIZE).decode('ascii')
         if not data:
             print("Connection ended by user")
             c.close()
@@ -54,8 +53,8 @@ def threaded(c, SERVER):
                 Name = name
             else:
                 c.send("GO AWAY".encode("ascii"))
-        elif "GET" in data and Name != None:
-            data = data.replace("GET ", "")
+        elif "GETMSG" in data and Name != None:
+            data = data.replace("GETMSG ", "")
             if not SERVER.GetClient(data):
                 c.send("User : {} NOTEXIST".format(data).encode('ascii'))
                 return
@@ -66,7 +65,7 @@ def threaded(c, SERVER):
             c.send(chat.encode("ascii"))
                 
             pass
-        elif "SEND" in data and Name != None:
+        elif "SENDMSG" in data and Name != None:
             data = data.replace("SEND ", "")
             receiver = data.split(' ')[0]
             data = data.replace(receiver, "")
@@ -80,3 +79,33 @@ def threaded(c, SERVER):
             else:
                 SERVER.UpdateChat(receiver, Name, Name, data)
             c.send("DONE".encode('ascii'))
+        elif "SENDFILE" in data and Name != None:
+            data = data.replace("SENDFILE ", "")
+            data = data.replace('\n','')
+            print(data)
+            if not SERVER.isLoggedIn(data):
+                c.send("OFFLINE {}".format(data).encode('ascii'))
+                return 
+            
+            c.send("OK".encode('ascii'))
+            # Receives the filename and filesize
+            filename = c.recv(MSG_SIZE).decode('ascii')
+            # Start to receive the file.
+            print("file name: {}".format(filename))
+            f = open("{}_{}".format(data, filename), "wb")
+            fi = c.recv(1000)
+            while fi:
+                # Make a loading bar here.
+                f.write(fi)
+                fi = c.recv(1000  )
+                print(fi)
+                if b'END' in fi:
+                    break
+            f.close()
+            print("Finish receiving")
+            c.send("DONE".encode('ascii'))
+        elif "GETFILE" in data and Name != None:
+            data = data.replace("GETFILE ", "")
+            can_send = SERVER.Receivable(Name)
+            if len(can_send) == 0:
+                c.send("")

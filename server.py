@@ -6,17 +6,20 @@ import selectors
 from threaded import *
 import json
 import csv
-from multiprocessing import Lock()
+import os
 
 class server:
     def __init__(self, path_user):
         Users = set()
         self.users = Users
-
+        self.OnlineUsers = set()
         tmp = pd.read_csv(path_user).values
         for i in tmp:
             Users.add(i[0])
+            if i[3] == 1:
+                self.OnlineUsers.add(i[0])
         print("Current Registered Users ", self.users)
+        print("Online User: ", self.OnlineUsers)
     def Register(self, name, pwd):
         if name in self.users:
             return False
@@ -35,6 +38,8 @@ class server:
     # Query if the "name" is in users
     def GetClient(self, name):
         return name in self.users
+    def IsClientOnline(self, name):
+        return name in self.OnlineUsers
     def isLoggedIn(self, name):
         df = pd.read_csv("./storing/Accounts.csv")
         for i in range(len(df.active)):
@@ -53,6 +58,7 @@ class server:
                     break
         df.to_csv("./storing/Accounts.csv", index=False)
         print("User: {} Loggen in!".format(name))
+        self.OnlineUsers.add(name)
         # Check if the pwd matches the pwd of registered name.
         return True
     def GetChat(self, name, recv, whoami):
@@ -86,3 +92,12 @@ class server:
         df = df.append(df_t, ignore_index=True)
         df.to_csv("./storing/chatroom/{}_{}.csv".format(name, recv), index=False, quoting=csv.QUOTE_NONNUMERIC)
         return 
+    def Storefile(self):
+        pass
+    def Receivable(self, name):
+        files = os.listdir('./')
+        matching_files = []
+        for i in files:
+            if name in i:
+                matching_files.append(i)
+        return matching_files
