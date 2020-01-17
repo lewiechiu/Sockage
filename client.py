@@ -49,7 +49,9 @@ def chatwith(username,root):
 		return 0
 	else:
 		#print('chatwith:', reply)
+		root.clear_chat_text()
 		root.newmessage(reply.decode() + '\n')
+		return 1
 
 	#except:
 		#return 0
@@ -257,6 +259,10 @@ class ChatRoom(tk.Tk):
 		mainpage(self.sock)
 	def send_file(self):
 		print('send file')
+	def clear_chat_text(self):
+		self.chat.config(state="normal")
+		self.chat.delete('1.0', 'end')
+		self.chat.config(state="disabled")
 
 '''
 class MainApplication(tk.Tk):
@@ -489,5 +495,5 @@ register_btn.pack()
 window.mainloop()'''
 socket1 = SocketSetup()
 print(socket1)
-#mainpage(socket1)
-mainapplication(socket1)
+mainpage(socket1)
+#mainapplication(socket1)
