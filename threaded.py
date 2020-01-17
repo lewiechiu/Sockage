@@ -94,17 +94,17 @@ def threaded(c, SERVER):
                 c.send("OK".encode('ascii'))
                 # Start to receive the file.
                 print("file name: {}".format(filename))
-                f = open("{}_{}".format(data, filename), "wb")
+                f = open("S_{}_{}".format(data, filename), "wb")
                 fi = c.recv(1000)
                 while fi:
+                    print(fi)
+                    if b'END' in fi:
+                        f.write(fi[:-3])
+                        break
                     # Make a loading bar here.
                     f.write(fi)
-                    fi = c.recv(1000  )
-                    print(fi)
-                    fi.replace(b'END', b'')
-                    if b'END' in fi:
-                        f.write(fi)
-                        break
+                    fi = c.recv(1000)
+                    
                 f.close()
                 print("Finish receiving")
                 c.send("DONE".encode('ascii'))
@@ -116,18 +116,20 @@ def threaded(c, SERVER):
             if len(can_send) == 0:
                 c.send("NOFILES".encode('ascii'))
             else:
-                c.send("{}".format(len(can_send)))
+                c.send(str(len(can_send)).encode('ascii'))
+                resp = receive(c)
                 for i in can_send:
-                    
-                    c.send("SENDING {}".format(i))
+                    filename = i.replace('S_', "")
+                    c.send("SENDING {}".format(filename).encode('ascii'))
                     resp = receive(c)
                     
-                    f = open("{}".format(i), "rb")
+                    f = open("{}".format(i).encode('ascii'), "rb")
                     l = f.read(1000)
                     while l:
                         c.sendall(l)
                         l = f.read(1000)
                     c.sendall(b'END')
                     resp = receive(c)
+                    os.remove(i)
         elif "LOGOUT" in data and Name != None:
             SERVER.GoOffline(Name)
