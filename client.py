@@ -177,17 +177,17 @@ class RecvThread(threading.Thread):
 			if reply == b'NOFILES':
 				pass
 			else:
-    			reply = reply.decode()
+				reply = reply.decode()
 				parts = reply.split(' ')
 				numoffile,a,filename = int(parts[0]),part[1],parts[2]
 				reply = f'{a} {filename}'
 				for i in range(numoffile):
-    				_,filename = reply.split(' ')
-    				f = open(filename, 'wb')
+					_,filename = reply.split(' ')
+					f = open(filename, 'wb')
 					self.sock.send(b'OK')
 					reply = self.sock.recv(1000)
 					while reply:
-    					if b'END' in  reply:
+						if b'END' in  reply:
 							f.write(reply[:-3])
 							break
 						f.write(reply)
