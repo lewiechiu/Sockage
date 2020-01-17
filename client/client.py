@@ -12,7 +12,6 @@ username_lock = threading.Lock()
 '''
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 65432        # The port used by the server
-
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 	s.connect((HOST, PORT))
 	while True:
@@ -380,7 +379,6 @@ class MainApplication(tk.Tk):
 			chatroom(username, self.sock)
 		else:
 			messagebox.showinfo(title='cannot chat!', message='no this user or not online')
-
 '''
 
 class RegisterPage(tk.Tk):
@@ -418,7 +416,7 @@ class RegisterPage(tk.Tk):
 			if password_accept != 1:
 				messagebox.showinfo(title='password', message='password GG!')
 			else:
-				messagebox.showinfo(title='login', message='success')
+				messagebox.showinfo(title='register', message='success')
 				self.destroy()
 				mainpage(self.sock)
 	def go_mainpage(self):
@@ -461,8 +459,9 @@ class LoginPage(tk.Tk):
 				messagebox.showinfo(title='password', message='password GG!')
 			else:
 				messagebox.showinfo(title='login', message='success')
+				myusername = self.username_entry.get()
 				self.destroy()
-				mainapplication(self.sock)
+				mainapplication(self.sock, myusername)
 
 		#messagebox.showinfo(title='send_request', message='succeed')
 	def go_mainpage(self):
@@ -510,7 +509,6 @@ def login_ask(a):
 		return 1
 '''
 def chatroom(username, sock):
-
 	chatr = ChatRoom(username, sock)
 	chatr.after(1000, ChatNewMessage, chatr)
 	chatr.mainloop()
@@ -521,10 +519,9 @@ def login(sock):
 	loginpage = LoginPage(sock)
 	loginpage.mainloop()
 
-def mainapplication(sock):
+def mainapplication(sock, username):
 	#mainapplicationpage = MainApplication(sock)
 	#mainapplicationpage.mainloop()
-	username = 'OuO'
 	chatr = ChatRoom(username, sock)
 	chatr.after(1000, ChatNewMessage, chatr)
 	chatr.mainloop()
@@ -543,14 +540,12 @@ window = tk.Tk()
 window.title('MSG App')
 window.geometry('800x600')
 window.configure(background='black')
-
 #title
 header_label = tk.Label(window, text='my MSG', 
 						background='black', 
 						fg='white', 
 						font=("Courier", 44))
 header_label.pack()
-
 #
 login_btn = tk.Button(window, text='login', 
 					  font=("Courier", 40),
@@ -562,7 +557,6 @@ register_btn = tk.Button(window,
 						 font=("Courier", 40), 
 						 width=10)
 register_btn.pack()
-
 # 運行主程式
 window.mainloop()'''
 socket1 = SocketSetup()
