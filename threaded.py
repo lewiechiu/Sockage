@@ -101,7 +101,9 @@ def threaded(c, SERVER):
                     f.write(fi)
                     fi = c.recv(1000  )
                     print(fi)
+                    fi.replace(b'END', b'')
                     if b'END' in fi:
+                        f.write(fi)
                         break
                 f.close()
                 print("Finish receiving")
@@ -115,15 +117,17 @@ def threaded(c, SERVER):
                 c.send("NOFILES".encode('ascii'))
             else:
                 c.send("{}".format(len(can_send)))
-                
-                
                 for i in can_send:
+                    
                     c.send("SENDING {}".format(i))
+                    resp = receive(c)
+                    
                     f = open("{}".format(i), "rb")
                     l = f.read(1000)
                     while l:
                         c.sendall(l)
                         l = f.read(1000)
                     c.sendall(b'END')
+                    resp = receive(c)
         elif "LOGOUT" in data and Name != None:
             SERVER.GoOffline(Name)
