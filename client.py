@@ -113,7 +113,7 @@ def register_password(password, sock):
 		print('register_password:',reply)
 		return 0
 def SendMessage(username, message, sock):
-	msg = 'SEND ' + username + ' ' + str(len(message.encode())) + ' ' + message
+	msg = 'SENDMSG ' + username + ' ' + message
 	lock.acquire()
 	sock.sendall(msg.encode())
 	reply = sock.recv(1024)

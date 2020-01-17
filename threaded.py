@@ -76,7 +76,7 @@ def threaded(c, SERVER):
             data = data.replace(receiver, "")
             data = data.replace(" ", "", 1)
             print(data)
-            if receiver > Name:
+            if receiver < Name:
                 SERVER.UpdateChat(Name, receiver, Name, data)
             else:
                 SERVER.UpdateChat(receiver, Name, Name, data)

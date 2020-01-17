@@ -91,7 +91,10 @@ class server:
     def UpdateChat(self, name, recv, whoami, message):
         df = pd.read_csv("./storing/chatroom/{}_{}.csv".format(name, recv))
         col = df.columns
-        last_NO = int(df.values[-1][0]) + 1
+        if len(df.values) > 0:
+            last_NO = int(df.values[-1][0]) + 1
+        else:
+            last_NO = 1
         if whoami == name:
             insert_data = [[last_NO, whoami, message, 1, 0]]
         else:
