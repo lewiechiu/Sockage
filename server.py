@@ -68,6 +68,10 @@ class server:
     def GetChat(self, name, recv, whoami):
         print("getting chat {} {}".format(name, recv))
         chat = []
+        print(os.listdir('./storing/chatroom/'))
+        if "{}_{}".format(name, recv) not in os.listdir('./storing/chatroom/'):
+            df = pd.DataFrame(columns= ["No","Sender","msg","A_read","B_read"])
+            df.to_csv("./storing/chatroom/{}_{}.csv".format(name, recv), index=False)
         df = pd.read_csv("./storing/chatroom/{}_{}.csv".format(name, recv))
         print(df)
         for i in df.values:
