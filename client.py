@@ -170,6 +170,33 @@ class RecvThread(threading.Thread):
 				else:
 					self.queue.put(reply.decode())
 				#print('chatwith:', reply)
+			msg = 'GETFILE'
+			lock.acquire()
+			self.sock.sendall(msg.encode())
+			reply = self.sock.recv(1024)
+			if reply == b'NOFILES':
+				pass
+			else:
+    			reply = reply.decode()
+				parts = reply.split(' ')
+				numoffile,a,filename = int(parts[0]),part[1],parts[2]
+				reply = f'{a} {filename}'
+				for i in range(numoffile):
+    				_,filename = reply.split(' ')
+    				f = open(filename, 'wb')
+					self.sock.send(b'OK')
+					reply = self.sock.recv(1000)
+					while reply:
+    					if b'END' in  reply:
+							f.write(reply[:-3])
+							break
+						f.write(reply)
+					self.sock.send(b'ACK')
+					print(f'Success receive {filename}')
+					f.close()
+					if i+1 < numoffile:
+						reply = self.sock.recv(1024)
+
 			#self.queue.put(str(self.cnt))
 			print('thread!')
 			#self.cnt += 1
