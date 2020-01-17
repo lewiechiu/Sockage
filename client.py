@@ -141,15 +141,23 @@ def SendMessage(username, message, sock):
 	reply = sock.recv(1024)
 	lock.release()
 	#reply = sock.recv()
+def parseChatJson(input):
+	chardata = ''
+		charjson = json.loads(input)
+		readed = 1
+		for sentence in charjson:
+			chardata += sentence['Sender'] + ': '
+			chardata += sentence['msg'] + '\n'
+			if readed == 1 && sentence[root.myusername] == 0:
+				readed = 0
+				chardata += '     =========unread=========\n'
+	return chardata
 def ChatNewMessage(root):
 	try:
 		userinput = root.queue.get(0)
 		root.clear_chat_text()
-		#chardata = ''
-		#charjson = json.loads(userinput)
-		#for sentence in charjson:
-			#chardata += sentence['Sender']
-		root.newmessage(userinput + '\n')
+		chardata = parseChatJson(userinput)
+		root.newmessage(chardata)
 		#global lock
 		#msg = 'ask new message'
 		#lock.acquire()
