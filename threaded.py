@@ -10,6 +10,7 @@ def threaded(c, SERVER):
     Name = None
     while True:
         data = c.recv(MSG_SIZE).decode('ascii')
+        print(data.encode())
         if not data:
             print("Connection ended by user")
             c.close()
@@ -48,6 +49,7 @@ def threaded(c, SERVER):
                 continue
             c.send("HI".encode('ascii'))
             pwd = c.recv(MSG_SIZE).decode('ascii')
+            print(f'password: {pwd}')
             if SERVER.Login(name, pwd):
                 c.send("WELCOME".encode("ascii"))
                 Name = name
@@ -66,7 +68,7 @@ def threaded(c, SERVER):
                 
             pass
         elif "SENDMSG" in data and Name != None:
-            data = data.replace("SEND ", "")
+            data = data.replace("SENDMSG ", "")
             receiver = data.split(' ')[0]
             data = data.replace(receiver, "")
             data = data.replace(" ", "", 1)
