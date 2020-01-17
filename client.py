@@ -199,14 +199,25 @@ class RecvThread(threading.Thread):
 			if reply == b'NOFILES':
 				pass
 			else:
-				numoffile = int(reply.decode())
+    			reply = reply.decode()
+				parts = reply.split(' ')
+				numoffile,a,filename = int(parts[0]),part[1],parts[2]
+				reply = f'{a} {filename}'
 				for i in range(numoffile):
-					reply = self.sock.recv(8).decode()
-					reply = reply.replace('SENDING ','')
-					reply = self.sock.recv(8).decode()
+    				_,filename = reply.split(' ')
+    				f = open(filename, 'wb')
+					self.sock.send(b'OK')
 					reply = self.sock.recv(1000)
 					while reply:
-
+    					if b'END' in  reply:
+							f.write(reply[:-3])
+							break
+						f.write(reply)
+					self.sock.send(b'ACK')
+					print(f'Success receive {filename}')
+					f.close()
+					if i+1 < numoffile:
+						reply = self.sock.recv(1024)
 
 			#self.queue.put(str(self.cnt))
 			print('thread!')
