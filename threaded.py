@@ -28,6 +28,7 @@ def threaded(c, SERVER):
             else:
                 c.send("YES".encode('ascii'))
             pwd = c.recv(MSG_SIZE).decode('ascii')
+            print("Password: {}".format(pwd))
             pwd = pwd.replace('\n', "")
             if SERVER.Register(name, pwd):
                 c.send("GOODJOB".encode('ascii'))

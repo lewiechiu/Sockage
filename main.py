@@ -22,5 +22,5 @@ if __name__ == "__main__":
     while 1:
         conn, addr = servSocket.accept()
         print ("New connection from IP: {}, Port: {}".format(addr[0], addr[1]))
-        start_new_thread(threaded, (conn, SERVER ) )
+        start_new_thread(threaded, (conn, SERVER) )
         

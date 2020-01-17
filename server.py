@@ -27,7 +27,7 @@ class server:
             # print(name, pwd)
             df = pd.read_csv("./storing/Accounts.csv")
             col = df.columns
-            df_t = pd.DataFrame([[name, pwd, "140.112.106.88", 1]], columns=col)
+            df_t = pd.DataFrame([[name, pwd, "140.112.106.88", 0]], columns=col)
             df = df.append(df_t, ignore_index=True)
             df.to_csv("./storing/Accounts.csv", index=False)
             print("Currently Registered Clients")
@@ -51,11 +51,15 @@ class server:
     def Login(self, name, pwd):
         print(name, pwd)
         df = pd.read_csv("./storing/Accounts.csv")
+        can_login = False
         for i in range(len(df.active)):
             if df.Username[i] == name and df.active[i] == 0:
                 if str(df.hashed_pwd[i]) == pwd:
                     df.active[i] = 1
+                    can_login = True
                     break
+        if can_login == False:
+            return can_login
         df.to_csv("./storing/Accounts.csv", index=False)
         print("User: {} Loggen in!".format(name))
         self.OnlineUsers.add(name)
